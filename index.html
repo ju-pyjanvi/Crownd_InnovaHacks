@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="crownd-logo.png"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crownd — Shop. Post. Get Paid.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --mint:    #EAF7F4;
+    --maroon:  #A8284C;
+    --sage:    #7A8C6A;
+    --warm:    #FDF6F0;
+    --dark:    #1C2221;
+    --muted:   #5A6460;
+    --pink:    #F0997B;
+    --teal:    #5DCAA5;
+    --amber:   #FAC775;
+    --lavender:#AFA9EC;
+    --cream:   #F9F4EE;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--mint);
+    color: var(--dark);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ── BLOBS ── */
+  .blob-field {
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none; overflow: hidden;
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.55;
+    filter: blur(95px);
+    animation: blobdrift 18s ease-in-out infinite alternate;
+  }
+  .blob-1 { width: 520px; height: 520px; top: -120px; right: -80px;
+    background: radial-gradient(circle, var(--pink), var(--amber)); animation-delay: 0s; }
+  .blob-2 { width: 380px; height: 380px; bottom: 20%; right: 10%;
+    background: radial-gradient(circle, var(--teal), var(--lavender)); animation-delay: -6s; }
+  .blob-3 { width: 280px; height: 280px; top: 50%; left: -60px;
+    background: radial-gradient(circle, var(--amber), var(--pink)); animation-delay: -12s; }
+  .blob-4 { width: 200px; height: 200px; bottom: 5%; left: 20%;
+    background: radial-gradient(circle, var(--lavender), var(--teal)); animation-delay: -4s; }
+
+  @keyframes blobdrift {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 20px) scale(1.08); }
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px;
+    background: rgba(234, 247, 244, 0.82);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(122,140,106,0.12);
+  }
+
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 26px;
+    letter-spacing: -0.5px;
+    text-decoration: none;
+  }
+  .logo span:first-child { color: var(--maroon); }
+  .logo span:last-child  { color: var(--sage); }
+
+  .nav-right { display: flex; align-items: center; gap: 32px; }
+
+  .toggle-wrap {
+    display: flex; align-items: center;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(122,140,106,0.25);
+    border-radius: 100px;
+    padding: 4px;
+  }
+  .toggle-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    padding: 7px 20px;
+    border-radius: 100px; border: none;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    background: transparent; color: var(--muted);
+  }
+  .toggle-btn.active {
+    background: var(--dark); color: white;
+  }
+
+  nav .cta-nav {
+    font-size: 13px; font-weight: 600;
+    padding: 9px 22px;
+    background: var(--maroon);
+    color: white; border: none;
+    border-radius: 100px; cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.18s;
+  }
+  nav .cta-nav:hover { opacity: 0.88; }
+
+  /* ── MAIN WRAP ── */
+  main { position: relative; z-index: 1; }
+
+  /* ── PAGES ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 140px 48px 80px;
+    max-width: 760px;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--sage); margin-bottom: 28px;
+  }
+
+  .hero-headline {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(64px, 9vw, 108px);
+    font-weight: 600;
+    line-height: 0.95;
+    letter-spacing: -3px;
+    color: var(--dark);
+    margin-bottom: 36px;
+  }
+  .hero-headline em {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--maroon);
+    letter-spacing: -2px;
+  }
+
+  .hero-sub {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--muted);
+    max-width: 480px;
+    line-height: 1.55;
+    margin-bottom: 48px;
+  }
+
+  .hero-actions { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 15px; font-weight: 600;
+    padding: 16px 36px;
+    background: var(--dark); color: white;
+    border: none; border-radius: 100px;
+    cursor: pointer; text-decoration: none;
+    transition: transform 0.18s, opacity 0.18s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); opacity: 0.9; }
+
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 15px; font-weight: 500;
+    padding: 16px 36px;
+    background: transparent; color: var(--dark);
+    border: 1.5px solid rgba(28,34,33,0.2);
+    border-radius: 100px; cursor: pointer; text-decoration: none;
+    transition: border-color 0.18s, background 0.18s;
+  }
+  .btn-ghost:hover { border-color: var(--dark); background: rgba(28,34,33,0.04); }
+
+  /* ── TICKER ── */
+  .ticker-section {
+    padding: 40px 0;
+    border-top: 1px solid rgba(122,140,106,0.15);
+    border-bottom: 1px solid rgba(122,140,106,0.15);
+    overflow: hidden;
+    position: relative;
+  }
+  .ticker-label {
+    position: absolute; left: 48px; top: 50%; transform: translateY(-50%);
+    font-size: 10px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--sage);
+    background: var(--mint); padding: 0 16px 0 0;
+    z-index: 2;
+  }
+  .ticker-track {
+    display: flex; gap: 0;
+    animation: tickerscroll 22s linear infinite;
+    width: max-content;
+  }
+  .ticker-track:hover { animation-play-state: paused; }
+  .ticker-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 40px;
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 22px; color: rgba(28,34,33,0.45);
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .ticker-item:hover { color: var(--dark); }
+  .ticker-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%; background: var(--sage); opacity: 0.5;
+  }
+  @keyframes tickerscroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ── HOW IT WORKS ── */
+  .section { padding: 100px 48px; }
+
+  .section-eyebrow {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--sage); margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.12;
+    color: var(--dark);
+    margin-bottom: 64px;
+    max-width: 520px;
+  }
+
+  /* ── FLOW (How It Works) ── */
+  .flow-wrap { position: relative; }
+
+  .flow-rail {
+    display: flex; align-items: flex-start;
+    gap: 0;
+    position: relative;
+    margin-bottom: 56px;
+  }
+  .flow-rail::before {
+    content: '';
+    position: absolute;
+    top: 27px; left: 27px; right: 27px;
+    height: 2px;
+    background: rgba(122,140,106,0.25);
+    z-index: 0;
+  }
+  .flow-rail-fill {
+    position: absolute;
+    top: 27px; left: 27px;
+    height: 2px;
+    background: var(--maroon);
+    z-index: 1;
+    width: 0%;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  }
+
+  .flow-node {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+    cursor: pointer;
+    position: relative; z-index: 2;
+    padding: 0 16px;
+  }
+
+  .flow-dot {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--cream);
+    border: 2px solid rgba(122,140,106,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--muted);
+    margin-bottom: 18px;
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+  }
+  .flow-node-label {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--sage); opacity: 0.7;
+    transition: opacity 0.3s, color 0.3s;
+  }
+
+  .flow-node.active .flow-dot {
+    background: var(--maroon);
+    border-color: var(--maroon);
+    color: white;
+    transform: scale(1.12);
+    box-shadow: 0 8px 24px rgba(168,40,76,0.3);
+  }
+  .flow-node.active .flow-node-label { color: var(--maroon); opacity: 1; }
+  .flow-node.done .flow-dot {
+    background: var(--sage); border-color: var(--sage); color: white;
+  }
+
+  .flow-panel {
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(122,140,106,0.15);
+    border-radius: 24px;
+    padding: 56px 64px;
+    min-height: 200px;
+    position: relative;
+    overflow: hidden;
+  }
+  .flow-panel-inner {
+    display: none;
+    align-items: center;
+    gap: 48px;
+    animation: flowfade 0.4s ease;
+  }
+  .flow-panel-inner.active { display: flex; }
+
+  @keyframes flowfade {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .flow-panel-num {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 88px; font-weight: 400;
+    color: var(--maroon); opacity: 0.18;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .flow-panel-text h3 {
+    font-size: 24px; font-weight: 600;
+    margin-bottom: 12px; color: var(--dark);
+  }
+  .flow-panel-text p {
+    font-size: 15px; line-height: 1.7; color: var(--muted);
+    max-width: 480px;
+  }
+
+  .flow-controls {
+    display: flex; justify-content: center; gap: 12px;
+    margin-top: 32px;
+  }
+  .flow-controls button {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(28,34,33,0.18);
+    background: transparent;
+    color: var(--dark);
+    cursor: pointer;
+    font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.18s;
+  }
+  .flow-controls button:hover { background: var(--dark); color: white; border-color: var(--dark); }
+  .flow-controls button:disabled { opacity: 0.3; cursor: default; }
+  .flow-controls button:disabled:hover { background: transparent; color: var(--dark); }
+
+  @media (max-width: 720px) {
+    .flow-panel { padding: 36px 28px; }
+    .flow-panel-inner { flex-direction: column; gap: 16px; text-align: center; }
+    .flow-panel-num { font-size: 56px; }
+    .flow-node-label { display: none; }
+  }
+
+  /* ── CASHBACK CALLOUT ── */
+  .callout {
+    margin: 0 48px;
+    padding: 56px 64px;
+    background: var(--dark);
+    border-radius: 28px;
+    display: flex; align-items: center;
+    justify-content: space-between;
+    gap: 40px; flex-wrap: wrap;
+  }
+  .callout-left h2 {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: clamp(28px, 4vw, 44px);
+    color: white; line-height: 1.2; margin-bottom: 12px;
+  }
+  .callout-left p { font-size: 15px; color: rgba(255,255,255,0.55); max-width: 400px; line-height: 1.6; }
+  .callout-stat {
+    text-align: right; flex-shrink: 0;
+  }
+  .stat-number {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(52px, 7vw, 80px);
+    font-weight: 600; letter-spacing: -3px;
+    color: var(--amber); line-height: 1;
+  }
+  .stat-label {
+    font-size: 13px; color: rgba(255,255,255,0.45);
+    margin-top: 6px;
+  }
+
+
+  /* ── EXPERIENCE SECTION — THE SOLITAIRE DECK ── */
+  /* Signature element: three category cards rest as a closed hand of cards.
+     On hover, the whole hand fans open like cards drawn across a table. */
+
+  .experience {
+    padding: 120px 48px 140px;
+    position: relative;
+  }
+
+  .deck-hint {
+    font-size: 12px; color: var(--muted); opacity: 0.6;
+    margin-top: 8px; margin-bottom: 0;
+    font-style: italic;
+    font-family: 'DM Serif Display', serif;
+  }
+
+  .deck-wrap {
+    position: relative;
+    margin-top: 90px;
+    height: 460px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .deck-card {
+    position: absolute;
+    top: 0;
+    width: 320px;
+    min-height: 400px;
+    padding: 38px 34px;
+    border-radius: 22px;
+
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255,255,255,0.42),
+        rgba(255,255,255,0.16)
+      );
+
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+
+    border: 1px solid rgba(255,255,255,0.5);
+
+    box-shadow:
+      0 6px 16px rgba(28,34,33,0.10),
+      0 20px 40px rgba(28,34,33,0.10),
+      inset 0 1px 0 rgba(255,255,255,0.95),
+      inset 0 -1px 0 rgba(255,255,255,0.15);
+
+    cursor: pointer;
+    transform-origin: bottom center;
+    transition: transform 0.55s cubic-bezier(.22,1,.36,1), box-shadow 0.45s ease;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+
+  .deck-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(255,255,255,0.9), transparent 35%),
+      radial-gradient(circle at 80% 85%, rgba(255,255,255,0.25), transparent 45%);
+    pointer-events: none;
+  }
+
+  /* resting fan — slightly stacked like a held hand of cards */
+  .deck-card[data-card="0"] { transform: translateX(-92px) rotate(-9deg); z-index: 1; }
+  .deck-card[data-card="1"] { transform: translateX(0)     rotate(0deg);  z-index: 2; }
+  .deck-card[data-card="2"] { transform: translateX(92px)  rotate(9deg);  z-index: 1; }
+
+  /* full spread on hover of the whole deck */
+  .deck-wrap:hover .deck-card[data-card="0"] { transform: translateX(-260px) rotate(-12deg) translateY(-6px); }
+  .deck-wrap:hover .deck-card[data-card="1"] { transform: translateX(0)      rotate(0deg)   translateY(-22px); }
+  .deck-wrap:hover .deck-card[data-card="2"] { transform: translateX(260px)  rotate(12deg)  translateY(-6px); }
+
+  .deck-card:hover {
+    z-index: 5 !important;
+    box-shadow:
+      0 14px 28px rgba(28,34,33,0.14),
+      0 36px 64px rgba(28,34,33,0.16),
+      inset 0 1px 0 rgba(255,255,255,1);
+  }
+
+  .deck-card[data-card="0"] { background: linear-gradient(135deg, rgba(240,153,123,0.24), rgba(255,255,255,0.16)); }
+  .deck-card[data-card="1"] { background: linear-gradient(135deg, rgba(93,202,165,0.24), rgba(255,255,255,0.16)); }
+  .deck-card[data-card="2"] { background: linear-gradient(135deg, rgba(250,199,117,0.24), rgba(255,255,255,0.16)); }
+
+  .deck-suit {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--maroon);
+    margin-bottom: auto;
+    padding-bottom: 24px;
+    position: relative; z-index: 2;
+  }
+
+  .deck-card h3 {
+    font-size: 22px; font-weight: 600;
+    margin-bottom: 12px; color: var(--dark);
+    position: relative; z-index: 2;
+  }
+  .deck-card p {
+    font-size: 14px; line-height: 1.7; color: var(--muted);
+    flex-grow: 1;
+    position: relative; z-index: 2;
+  }
+  .deck-example {
+    margin-top: 20px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.35);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.55);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+    font-size: 13px; color: var(--dark); font-weight: 500;
+    position: relative; z-index: 2;
+  }
+
+  @media (max-width: 900px) {
+    .deck-wrap { height: auto; flex-direction: column; align-items: center; gap: 24px; margin-top: 56px; }
+    .deck-card { position: relative; width: 100%; max-width: 360px; min-height: auto; }
+    .deck-card[data-card="0"],
+    .deck-card[data-card="1"],
+    .deck-card[data-card="2"] { transform: none; }
+    .deck-wrap:hover .deck-card[data-card="0"],
+    .deck-wrap:hover .deck-card[data-card="1"],
+    .deck-wrap:hover .deck-card[data-card="2"] { transform: none; }
+  }
+
+  /* ── CROWND SCORE — THE RISING RIVER ── */
+  /* Signature: one continuous flowing line that rises across four named
+     reaches, like a river gaining strength toward the sea. Not four boxes —
+     one progression, because that is what a score actually is. */
+
+  .score-section { padding: 100px 48px 140px; position: relative; }
+
+  .river-wrap {
+    position: relative;
+    margin-top: 80px;
+    padding: 0 0 0 0;
+  }
+
+  .river-svg { width: 100%; height: auto; display: block; }
+
+  .river-stops {
+    display: flex;
+    margin-top: -8px;
+  }
+  .river-stop {
+    flex: 1;
+    padding: 0 18px 0 0;
+    cursor: default;
+  }
+  .river-stop:last-child { padding-right: 0; }
+
+  .river-stop .reach-name {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 21px;
+    color: var(--dark);
+    margin-bottom: 4px;
+    transition: color 0.25s;
+  }
+  .river-stop .reach-range {
+    font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--maroon);
+    opacity: 0.65;
+    margin-bottom: 12px;
+  }
+  .river-stop p {
+    font-size: 13px; line-height: 1.6; color: var(--muted);
+    max-width: 220px;
+  }
+  .river-stop:hover .reach-name { color: var(--maroon); }
+  .river-stop:nth-child(3) .reach-name { color: var(--maroon); }
+
+  @media (max-width: 900px) {
+    .river-svg { display: none; }
+    .river-stops { flex-direction: column; gap: 28px; }
+    .river-stop { padding: 0 0 20px 20px; border-left: 2px solid rgba(168,40,76,0.25); }
+    .river-stop p { max-width: none; }
+  }
+
+  /* ── BRANDS PAGE ── */
+  .brands-hero {
+    min-height: 70vh;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 140px 48px 80px;
+    max-width: 700px;
+  }
+  .brands-hero .hero-eyebrow { color: var(--amber); }
+
+  .tiers-section { padding: 60px 48px 120px; }
+
+  .tiers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px;
+    margin-top: 64px;
+    align-items: start;
+  }
+
+  /* claymorphism: soft, puffy, single warm light source, no hairline borders */
+  .tier-card {
+    padding: 48px 40px;
+    border-radius: 32px;
+    border: none;
+    background: var(--cream);
+    box-shadow:
+      8px 8px 20px rgba(168,100,80,0.14),
+      -8px -8px 20px rgba(255,255,255,0.85),
+      inset 0 0 0 rgba(0,0,0,0);
+    position: relative; overflow: hidden;
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1), box-shadow 0.3s ease;
+  }
+  .tier-card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+      12px 12px 28px rgba(168,100,80,0.18),
+      -10px -10px 26px rgba(255,255,255,0.9);
+  }
+  .tier-card.featured {
+    background: var(--dark);
+    transform: scale(1.04);
+    box-shadow:
+      10px 10px 26px rgba(0,0,0,0.28),
+      -6px -6px 20px rgba(60,70,68,0.35);
+  }
+  .tier-card.featured:hover {
+    transform: scale(1.04) translateY(-6px);
+    box-shadow:
+      14px 14px 32px rgba(0,0,0,0.32),
+      -8px -8px 24px rgba(60,70,68,0.4);
+  }
+
+  .tier-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 16px; border-radius: 100px;
+    background: var(--mint);
+    box-shadow: inset 2px 2px 5px rgba(122,140,106,0.18), inset -2px -2px 5px rgba(255,255,255,0.7);
+    color: var(--sage);
+    margin-bottom: 28px;
+  }
+  .tier-card.featured .tier-badge { background: rgba(255,255,255,0.08); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3), inset -2px -2px 5px rgba(255,255,255,0.05); color: rgba(255,255,255,0.6); }
+
+  .tier-card h3 {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 32px; margin-bottom: 6px;
+    color: var(--dark);
+  }
+  .tier-card.featured h3 { color: white; }
+
+  .tier-card .tier-subtitle {
+    font-size: 14px; color: var(--muted);
+    margin-bottom: 32px; line-height: 1.5;
+  }
+  .tier-card.featured .tier-subtitle { color: rgba(255,255,255,0.5); }
+
+  .tier-features { list-style: none; }
+  .tier-features li {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 14px; color: var(--dark);
+    padding: 10px 0;
+    line-height: 1.5;
+  }
+  .tier-features .check { color: var(--teal); flex-shrink: 0; font-size: 16px; }
+  .tier-card.featured .tier-features li { color: rgba(255,255,255,0.75); }
+  .tier-card.featured .tier-features .check { color: var(--amber); }
+
+  .tier-cta {
+    display: inline-block;
+    margin-top: 32px;
+    font-size: 13px; font-weight: 600;
+    padding: 14px 30px;
+    border-radius: 100px;
+    background: var(--mint);
+    box-shadow: 4px 4px 10px rgba(122,140,106,0.18), -4px -4px 10px rgba(255,255,255,0.75);
+    color: var(--dark); border: none; cursor: pointer;
+    text-decoration: none;
+    transition: box-shadow 0.18s, transform 0.18s;
+  }
+  .tier-cta:hover { transform: translateY(-2px); box-shadow: 5px 5px 14px rgba(122,140,106,0.22), -5px -5px 14px rgba(255,255,255,0.8); }
+  .tier-card.featured .tier-cta { background: var(--amber); color: var(--dark); box-shadow: 4px 4px 12px rgba(0,0,0,0.25); }
+  .tier-card.featured .tier-cta:hover { box-shadow: 5px 5px 16px rgba(0,0,0,0.3); }
+
+  @media (max-width: 900px) {
+    .tier-card.featured { transform: none; }
+    .tier-card.featured:hover { transform: translateY(-6px); }
+  }
+
+  /* ── BRANDS TICKER ── */
+  .brands-ticker { padding: 40px 0; overflow: hidden; }
+
+  /* ── BRANDS STATS — FLOWING STRIP ── */
+  .brand-stats-row {
+    display: flex; gap: 0;
+    margin: 0 48px;
+    position: relative;
+  }
+  .bstat {
+    flex: 1; padding: 8px 36px 8px 0;
+    position: relative;
+  }
+  .bstat:not(:last-child)::after {
+    content: '';
+    position: absolute; top: 8px; right: 0; bottom: 8px;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(168,40,76,0.22) 30%, rgba(168,40,76,0.22) 70%, transparent);
+  }
+  .bstat-num {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 48px; font-weight: 600; letter-spacing: -2px;
+    color: var(--maroon); margin-bottom: 8px;
+    line-height: 1;
+  }
+  .bstat-label { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* ── WHY CROWND — FLOWING LIST ── */
+  .why-section { padding: 100px 48px; }
+  .why-grid {
+    margin-top: 64px;
+  }
+  .why-cell {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+    padding: 30px 0;
+    border-bottom: 1px solid rgba(122,140,106,0.16);
+    transition: padding-left 0.3s ease;
+  }
+  .why-cell:first-child { padding-top: 0; }
+  .why-cell:last-child { border-bottom: none; }
+  .why-cell:hover { padding-left: 12px; }
+  .why-cell .wicon {
+    font-size: 13px; font-weight: 700; letter-spacing: 1px;
+    color: var(--maroon); opacity: 0.55;
+    flex-shrink: 0; width: 56px;
+    font-family: 'DM Serif Display', serif;
+    font-style: italic; font-size: 28px;
+    padding-top: 2px;
+  }
+  .why-cell .why-body { flex: 1; }
+  .why-cell h4 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .why-cell p  { font-size: 14px; color: var(--muted); line-height: 1.65; max-width: 560px; }
+
+  /* ── FOOTER CTA — LIQUID POUR ── */
+  .footer-cta {
+    margin: 40px 48px 80px;
+    padding: 80px 64px;
+    background: linear-gradient(135deg, var(--maroon), #7A1832);
+    border-radius: 32px;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .footer-cta::before {
+    content: '';
+    position: absolute; inset: -50%;
+    background: radial-gradient(circle at 30% 50%, rgba(250,199,117,0.2), transparent 60%),
+                radial-gradient(circle at 70% 50%, rgba(93,202,165,0.15), transparent 60%);
+  }
+  .liquid-ripple {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    opacity: 0.85;
+  }
+  .liquid-ripple svg { width: 100%; height: 100%; display: block; }
+  .liquid-ripple path {
+    animation: liquidshift 4s ease-in-out infinite;
+  }
+  .liquid-ripple path:nth-child(2) { animation-delay: -1.3s; }
+  .liquid-ripple path:nth-child(3) { animation-delay: -2.6s; }
+  @keyframes liquidshift {
+    0%, 100% { transform: translateY(0) scaleY(1); }
+    50%      { transform: translateY(-22px) scaleY(1.12); }
+  }
+  .footer-cta h2 {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: clamp(32px, 5vw, 52px);
+    color: white; margin-bottom: 14px;
+    position: relative;
+  }
+  .footer-cta p {
+    font-size: 16px; color: rgba(255,255,255,0.6);
+    margin-bottom: 40px; position: relative;
+  }
+  .footer-cta .btn-amber {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 15px; font-weight: 600;
+    padding: 18px 44px;
+    background: var(--amber); color: var(--dark);
+    border: none; border-radius: 100px; cursor: pointer;
+    text-decoration: none; position: relative;
+    transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .footer-cta .btn-amber:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,0,0,0.15); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .hero, .brands-hero { padding: 120px 20px 60px; }
+    .section, .experience, .score-section, .tiers-section, .why-section { padding: 60px 20px; }
+    .callout { margin: 0 20px; padding: 40px 28px; }
+    .callout-stat { text-align: left; }
+    .brand-stats-row { margin: 0 20px; flex-direction: column; }
+    .bstat { padding: 18px 0; }
+    .bstat:not(:last-child)::after { display: none; }
+    .bstat:not(:last-child) { border-bottom: 1px solid rgba(122,140,106,0.16); }
+    .footer-cta { margin: 40px 20px 60px; padding: 48px 28px; }
+    .steps { flex-direction: column; }
+    .step { border-radius: 0; }
+    .step:first-child { border-radius: 16px 16px 0 0; }
+    .step:last-child  { border-radius: 0 0 16px 16px; }
+    .step-arrow { display: none; }
+    .ticker-label { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blob, .ticker-track, .liquid-ripple path { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── BLOBS ── -->
+<div class="blob-field" aria-hidden="true">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+</div>
+
+<!-- ── NAV ── -->
+<nav>
+  <a class="logo" href="index.html">
+    <span>crow</span><span>nd</span>
+  </a>
+  <div class="nav-right">
+    <div class="toggle-wrap">
+      <button class="toggle-btn active" id="btn-creators" onclick="showPage('creators')">For Creators</button>
+      <button class="toggle-btn" id="btn-brands" onclick="showPage('brands')">For Brands</button>
+    </div>
+    <a href="auth.html" class="cta-nav" id="nav-cta">Join Crownd →</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ════════════════════════════════════════ CREATORS PAGE ════════════════════════════════════════ -->
+<div class="page active" id="page-creators">
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-eyebrow">For Creators · 1,000+ Followers</p>
+    <h1 class="hero-headline">
+      Shop.<br>
+      Post.<br>
+      <em>Get Paid.</em>
+    </h1>
+    <p class="hero-sub">
+      You're already buying things you love and posting about them. Crownd just makes sure you get paid for it — every single time.
+    </p>
+    <div class="hero-actions">
+      <a href="auth.html" class="btn-primary">Apply Now →</a>
+      <a href="#how-it-works" class="btn-ghost">See how it works</a>
+    </div>
+  </section>
+
+  <!-- PARTNER BRAND TICKER -->
+  <div class="ticker-section">
+    <span class="ticker-label">Partner Brands</span>
+    <div class="ticker-track">
+      <div class="ticker-item">Lenskart<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Nykaa<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Mamaearth<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Zomato<span class="ticker-dot"></span></div>
+      <div class="ticker-item">boAt<span class="ticker-dot"></span></div>
+      <div class="ticker-item">The Whole Truth<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Chaayos<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Plum<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Bewakoof<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Lenskart<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Nykaa<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Mamaearth<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Zomato<span class="ticker-dot"></span></div>
+      <div class="ticker-item">boAt<span class="ticker-dot"></span></div>
+      <div class="ticker-item">The Whole Truth<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Chaayos<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Plum<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Bewakoof<span class="ticker-dot"></span></div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how-it-works">
+    <p class="section-eyebrow">How It Works</p>
+    <h2 class="section-title">Three steps between you and your cashback.</h2>
+
+    <div class="flow-wrap">
+      <div class="flow-rail" id="flow-rail">
+        <div class="flow-rail-fill" id="flow-rail-fill"></div>
+
+        <div class="flow-node active" data-step="0" onclick="setFlowStep(0)">
+          <div class="flow-dot">01</div>
+          <div class="flow-node-label">Shop</div>
+        </div>
+        <div class="flow-node" data-step="1" onclick="setFlowStep(1)">
+          <div class="flow-dot">02</div>
+          <div class="flow-node-label">Post</div>
+        </div>
+        <div class="flow-node" data-step="2" onclick="setFlowStep(2)">
+          <div class="flow-dot">03</div>
+          <div class="flow-node-label">Get Paid</div>
+        </div>
+      </div>
+
+      <div class="flow-panel">
+        <div class="flow-panel-inner active" data-panel="0">
+          <div class="flow-panel-num">01</div>
+          <div class="flow-panel-text">
+            <h3>Shop at a partner brand</h3>
+            <p>Pay using your Crownd Wallet at any partner brand — online or in-store. Every real purchase counts.</p>
+          </div>
+        </div>
+        <div class="flow-panel-inner" data-panel="1">
+          <div class="flow-panel-num">02</div>
+          <div class="flow-panel-text">
+            <h3>Post about it</h3>
+            <p>Share a real post or story on Instagram tagging the brand. No scripts. No fake enthusiasm. Just your actual opinion.</p>
+          </div>
+        </div>
+        <div class="flow-panel-inner" data-panel="2">
+          <div class="flow-panel-num">03</div>
+          <div class="flow-panel-text">
+            <h3>Get cashback</h3>
+            <p>Once your post is verified (up to 14 days), cashback lands in your Crownd Wallet. Spend it at any partner brand.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-controls">
+        <button id="flow-prev" onclick="flowStep(-1)" aria-label="Previous step">←</button>
+        <button id="flow-next" onclick="flowStep(1)" aria-label="Next step">→</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CALLOUT STAT -->
+  <div class="callout">
+    <div class="callout-left">
+      <h2>Real buyers. Real posts. Real money back.</h2>
+      <p>No upfront fees. No minimum spends. Just shop the way you already do.</p>
+    </div>
+  </div>
+
+  <!-- EXPERIENCE — THE SOLITAIRE DECK -->
+  <section class="experience">
+    <p class="section-eyebrow">Where You Can Earn</p>
+    <h2 class="section-title">Cashback on everything you already spend on.</h2>
+    <p class="deck-hint">hover the deck</p>
+    <div class="deck-wrap">
+      <div class="deck-card" data-card="0">
+        <div class="deck-suit">I.</div>
+        <h3>Fashion & Beauty</h3>
+        <p>From eyewear to skincare, if you're buying and posting it anyway — you should be earning from it.</p>
+        <div style="display:flex;justify-content:center;align-items:center;margin:16px 0 4px;position:relative;z-index:2;">
+          <img src="fashion-icon.ico" alt="Fashion & Beauty" style="width:72px;height:72px;object-fit:contain;opacity:0.82;"/>
+        </div>
+        <div class="deck-example">Buy specs at Lenskart → post → get ₹1,800 cashback</div>
+      </div>
+      <div class="deck-card" data-card="1">
+        <div class="deck-suit">II.</div>
+        <h3>Food & Dining</h3>
+        <p>Restaurants, cafes, cloud kitchens, delivery apps. Your food posts are already content — make them count.</p>
+        <div style="display:flex;justify-content:center;align-items:center;margin:16px 0 4px;position:relative;z-index:2;">
+          <img src="food-icon.ico" alt="Food & Dining" style="width:140px;height:140px;object-fit:contain;opacity:0.82;"/>
+        </div>
+        <div class="deck-example">Lunch at Chaayos → story → get ₹400 cashback</div>
+      </div>
+      <div class="deck-card" data-card="2">
+        <div class="deck-suit">III.</div>
+        <h3>Lifestyle & Tech</h3>
+        <p>Earbuds, fitness, wellness, home — every unboxing video you film has cashback potential on Crownd.</p>
+        <div style="display:flex;justify-content:center;align-items:center;margin:16px 0 4px;position:relative;z-index:2;">
+          <img src="lifestyle-icon.ico" alt="Lifestyle & Tech" style="width:140px;height:140px;object-fit:contain;opacity:0.82;"/>
+        </div>
+        <div class="deck-example">Buy boAt earbuds → reel → get ₹2,200 cashback</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CROWND SCORE — THE RISING RIVER -->
+  <section class="score-section">
+    <p class="section-eyebrow">Your Crownd Score</p>
+    <h2 class="section-title">The more you post, the better the brands you unlock.</h2>
+    <p style="font-size:15px;color:var(--muted);max-width:520px;line-height:1.7;margin-bottom:0;">
+      Your Crownd Score grows with every verified post — factoring in engagement rate, content quality, and how many different brands you've posted about. Higher score = access to premium brand campaigns.
+    </p>
+
+    <div class="river-wrap">
+
+      <div style="position:relative;">
+      <svg class="river-svg" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,75 C150,75 150,55 300,55 C450,55 450,38 600,38 C750,38 750,18 900,18 C1050,18 1050,6 1200,6"
+              fill="none" stroke="rgba(168,40,76,0.18)" stroke-width="14" stroke-linecap="round"/>
+        <path d="M0,75 C150,75 150,55 300,55 C450,55 450,38 600,38 C750,38 750,18 900,18 C1050,18 1050,6 1200,6"
+              fill="none" stroke="var(--maroon)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="0"    cy="75" r="7" fill="var(--maroon)"/>
+        <circle cx="300"  cy="55" r="7" fill="var(--maroon)"/>
+        <circle cx="600"  cy="38" r="8" fill="var(--maroon)"/>
+        <circle cx="900"  cy="18" r="7" fill="var(--maroon)"/>
+        <circle cx="1200" cy="6"  r="9" fill="var(--amber)" stroke="var(--maroon)" stroke-width="2"/>
+      </svg>
+      <!-- Icons overlaid on dots: dots at 0%, 25%, 50%, 75% width; heights roughly 83%, 61%, 42%, 20% of SVG height -->
+      <span style="position:absolute;left:0.5%;top:83%;transform:translate(-50%,-100%);font-size:44px;color:var(--maroon);filter:drop-shadow(0 2px 4px rgba(168,40,76,0.3));line-height:1;">&#9813;</span>
+      <span style="position:absolute;left:25%;top:61%;transform:translate(-50%,-100%);font-size:44px;color:var(--maroon);filter:drop-shadow(0 2px 4px rgba(168,40,76,0.3));line-height:1;">&#9819;</span>
+      <span style="position:absolute;left:50%;top:42%;transform:translate(-50%,-100%);font-size:44px;color:var(--maroon);filter:drop-shadow(0 2px 4px rgba(168,40,76,0.3));line-height:1;">&#9812;</span>
+      <span style="position:absolute;left:75%;top:20%;transform:translate(-50%,-100%);font-size:44px;color:var(--maroon);filter:drop-shadow(0 3px 8px rgba(168,40,76,0.4));line-height:1;">&#9818;</span>
+      </div>
+
+      <div class="river-stops">
+        <div class="river-stop">
+          <div class="reach-name">Signet</div>
+          <div class="reach-range">0–199</div>
+          <p>New creator. Getting started with your first Crownd campaign.</p>
+        </div>
+        <div class="river-stop">
+          <div class="reach-name">Coronet</div>
+          <div class="reach-range">200–499</div>
+          <p>Consistent poster. Unlocking mid-range lifestyle and D2C brands.</p>
+        </div>
+        <div class="river-stop">
+          <div class="reach-name">Royal</div>
+          <div class="reach-range">500–799</div>
+          <p>High engagement. Access to premium brand partnerships and better cashback caps.</p>
+        </div>
+        <div class="river-stop">
+          <div class="reach-name">Sovereign</div>
+          <div class="reach-range">800+</div>
+          <p>Top tier. Curated brand collaborations. Priority matching. Exclusive campaigns.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER CTA -->
+  <div class="footer-cta">
+    <svg class="liquid-ripple" viewBox="0 0 800 300" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,140 C150,200 300,80 450,140 C600,200 700,100 800,150 L800,300 L0,300 Z" fill="rgba(250,199,117,0.30)"/>
+      <path d="M0,180 C150,110 300,230 450,170 C600,110 700,210 800,170 L800,300 L0,300 Z" fill="rgba(93,202,165,0.26)"/>
+      <path d="M0,220 C150,270 300,160 450,220 C600,270 700,180 800,225 L800,300 L0,300 Z" fill="rgba(175,169,236,0.22)"/>
+    </svg>
+    <h2>Your next haul should pay you back.</h2>
+    <p>Apply with your Instagram handle. Approval takes under 24 hours.</p>
+    <a href="auth.html" class="btn-amber">Apply as a Creator →</a>
+  </div>
+
+</div><!-- /page-creators -->
+
+
+<!-- ════════════════════════════════════════ BRANDS PAGE ════════════════════════════════════════ -->
+<div class="page" id="page-brands">
+
+  <!-- HERO -->
+  <section class="brands-hero">
+    <p class="hero-eyebrow" style="color:var(--amber);">For Brands · Performance-First Marketing</p>
+    <h1 class="hero-headline">
+      Pay for<br>
+      <em>results,</em><br>
+      not reach.
+    </h1>
+    <p class="hero-sub">
+      Stop spending ₹40–50L on campaigns with no purchase proof. Crownd only charges you when a real buyer posts — and buys.
+    </p>
+    <div class="hero-actions">
+      <a href="#tiers" class="btn-primary">See Partnership Tiers →</a>
+      <a href="#why-crownd" class="btn-ghost">Why it works</a>
+    </div>
+  </section>
+
+  <!-- BRAND STATS -->
+  <div class="brand-stats-row">
+    <div class="bstat">
+      <div class="bstat-num">80%</div>
+      <div class="bstat-label">Lower cost per campaign vs agency-managed influencer spend</div>
+    </div>
+    <div class="bstat">
+      <div class="bstat-num">1K+</div>
+      <div class="bstat-label">Minimum followers per creator ; real audiences, not bought</div>
+    </div>
+    <div class="bstat">
+      <div class="bstat-num">0</div>
+      <div class="bstat-label">Upfront content fees. You pay only when a purchase + post both happen</div>
+    </div>
+    <div class="bstat">
+      <div class="bstat-num">10%</div>
+      <div class="bstat-label">Crownd commission on verified sales — that's it</div>
+    </div>
+  </div>
+
+  <!-- TIERS -->
+  <section class="tiers-section" id="tiers">
+    <p class="section-eyebrow">Partnership Tiers</p>
+    <h2 class="section-title">Choose how you want to grow.</h2>
+    <div class="tiers-grid">
+
+      <div class="tier-card">
+        <div class="tier-badge">✦ Crown</div>
+        <h3>Cashback Campaigns</h3>
+        <p class="tier-subtitle">For brands who want authentic UGC without upfront commitments. Creators shop, post, and earn cashback funded from your pre-set monthly budget.</p>
+        <ul class="tier-features">
+          <li><span class="check">✓</span> Pay only when purchase + post is verified</li>
+          <li><span class="check">✓</span> Set your own cashback % and monthly cap</li>
+          <li><span class="check">✓</span> Brands choose the number of redemptions per month</li>
+          <li><span class="check">✓</span> First-purchase bonus voucher to attract new buyers</li>
+          <li><span class="check">✓</span> Real-time budget dashboard</li>
+        </ul>
+        <a href="partner.html" class="tier-cta">Partner Now</a>
+      </div>
+
+      <div class="tier-card featured">
+        <div class="tier-badge">👑 Throne</div>
+        <h3>Product Seeding</h3>
+        <p class="tier-subtitle" style="color:rgba(255,255,255,0.5)">Send product to pre-vetted creators. They post about it; the product is the reward — no cashback needed. Best for launches and building content libraries.</p>
+        <ul class="tier-features">
+          <li><span class="check">✓</span> Crownd matches you with relevant creators by niche</li>
+          <li><span class="check">✓</span> No wallet transaction — product fulfillment tracked by Crownd</li>
+          <li><span class="check">✓</span> Post verification before you ship the next batch</li>
+          <li><span class="check">✓</span> Content rights dashboard — download all creator posts</li>
+          <li><span class="check">✓</span> Ideal for D2C product launches</li>
+        </ul>
+        <a href="partner.html" class="tier-cta">Partner Now</a>
+      </div>
+
+      <div class="tier-card">
+        <div class="tier-badge">⚜️ Empire</div>
+        <h3>Curated Collaborations</h3>
+        <p class="tier-subtitle">Premium tier. Only Crownd Score 750+ creators qualify. Your brand gets matched with top-performing creators who have proven reach, consistency, and brand diversity.</p>
+        <ul class="tier-features">
+          <li><span class="check">✓</span> Handpicked creator matching by Crownd team</li>
+          <li><span class="check">✓</span> Full campaign management from brief to payout</li>
+          <li><span class="check">✓</span> Dedicated brand dashboard with analytics</li>
+          <li><span class="check">✓</span> Custom cashback % and engagement benchmarks</li>
+          <li><span class="check">✓</span> Brand protection rules — your terms, enforced by us</li>
+        </ul>
+        <a href="partner.html" class="tier-cta">Partner Now</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- WHY CROWND -->
+  <section class="why-section" id="why-crownd">
+    <p class="section-eyebrow">Why Crownd</p>
+    <h2 class="section-title">Why brands are switching to performance-linked influence.</h2>
+    <div class="why-grid">
+      <div class="why-cell">
+        <div class="wicon">I.</div>
+        <div class="why-body">
+          <h4>Purchase-verified UGC</h4>
+          <p>Every post on Crownd comes from someone who actually bought and paid for the product. That's a trust signal no paid campaign can replicate.</p>
+        </div>
+      </div>
+      <div class="why-cell">
+        <div class="wicon">II.</div>
+        <div class="why-body">
+          <h4>No working capital risk</h4>
+          <p>Brands pre-commit a monthly budget. Cashback is disbursed by Crownd automatically only when purchase + post is verified. You never overpay.</p>
+        </div>
+      </div>
+      <div class="why-cell">
+        <div class="wicon">III.</div>
+        <div class="why-body">
+          <h4>You set the rules</h4>
+          <p>Define max visits per influencer per month, eligible product categories, required post type, minimum follower count — all configurable in your brand dashboard.</p>
+        </div>
+      </div>
+      <div class="why-cell">
+        <div class="wicon">IV.</div>
+        <div class="why-body">
+          <h4>Fresh reach, every time</h4>
+          <p>The 2-redemption cap per influencer means Lenskart's Crownd posts always come from different people — your reach doesn't stagnate with the same 10 creators.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRAND TICKER -->
+  <div class="brands-ticker ticker-section">
+    <span class="ticker-label">Trusted Partners</span>
+    <div class="ticker-track" style="animation-direction: reverse;">
+      <div class="ticker-item">Lenskart<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Nykaa<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Mamaearth<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Zomato<span class="ticker-dot"></span></div>
+      <div class="ticker-item">boAt<span class="ticker-dot"></span></div>
+      <div class="ticker-item">The Whole Truth<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Chaayos<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Plum<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Lenskart<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Nykaa<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Mamaearth<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Zomato<span class="ticker-dot"></span></div>
+      <div class="ticker-item">boAt<span class="ticker-dot"></span></div>
+      <div class="ticker-item">The Whole Truth<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Chaayos<span class="ticker-dot"></span></div>
+      <div class="ticker-item">Plum<span class="ticker-dot"></span></div>
+    </div>
+  </div>
+
+  <!-- FOOTER CTA -->
+  <div class="footer-cta">
+    <svg class="liquid-ripple" viewBox="0 0 800 300" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,140 C150,200 300,80 450,140 C600,200 700,100 800,150 L800,300 L0,300 Z" fill="rgba(250,199,117,0.30)"/>
+      <path d="M0,180 C150,110 300,230 450,170 C600,110 700,210 800,170 L800,300 L0,300 Z" fill="rgba(93,202,165,0.26)"/>
+      <path d="M0,220 C150,270 300,160 450,220 C600,270 700,180 800,225 L800,300 L0,300 Z" fill="rgba(175,169,236,0.22)"/>
+    </svg>
+    <h2>Turn your ad budget into verified sales.</h2>
+    <p>List your brand on Crownd. Only pay when real buyers post about real purchases.</p>
+    <a href="partner.html" class="btn-amber">Partner with Crownd →</a>
+  </div>
+
+</div><!-- /page-brands -->
+
+</main>
+
+<script>
+  function showPage(page) {
+    const creators = document.getElementById('page-creators');
+    const brands   = document.getElementById('page-brands');
+    const btnC     = document.getElementById('btn-creators');
+    const btnB     = document.getElementById('btn-brands');
+    const navCta   = document.getElementById('nav-cta');
+
+    if (page === 'creators') {
+      creators.classList.add('active');
+      brands.classList.remove('active');
+      btnC.classList.add('active');
+      btnB.classList.remove('active');
+      navCta.textContent = 'Join Crownd →';
+      navCta.setAttribute('href', 'auth.html');
+    } else {
+      brands.classList.add('active');
+      creators.classList.remove('active');
+      btnB.classList.add('active');
+      btnC.classList.remove('active');
+      navCta.textContent = 'Partner with Us →';
+      navCta.setAttribute('href', 'partner.html');
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── HOW IT WORKS — interactive flow ── */
+  let flowCurrent = 0;
+  const FLOW_TOTAL = 3;
+  let flowAutoTimer = null;
+
+  function renderFlow() {
+    document.querySelectorAll('.flow-node').forEach(node => {
+      const step = parseInt(node.dataset.step, 10);
+      node.classList.remove('active', 'done');
+      if (step === flowCurrent) node.classList.add('active');
+      else if (step < flowCurrent) node.classList.add('done');
+    });
+
+    document.querySelectorAll('.flow-panel-inner').forEach(panel => {
+      panel.classList.toggle('active', parseInt(panel.dataset.panel, 10) === flowCurrent);
+    });
+
+    const fill = document.getElementById('flow-rail-fill');
+    if (fill) {
+      const pct = (flowCurrent / (FLOW_TOTAL - 1)) * 100;
+      fill.style.width = pct + '%';
+    }
+
+    const prevBtn = document.getElementById('flow-prev');
+    const nextBtn = document.getElementById('flow-next');
+    if (prevBtn) prevBtn.disabled = flowCurrent === 0;
+    if (nextBtn) nextBtn.disabled = flowCurrent === FLOW_TOTAL - 1;
+  }
+
+  function setFlowStep(n) {
+    flowCurrent = Math.max(0, Math.min(FLOW_TOTAL - 1, n));
+    renderFlow();
+    restartFlowAuto();
+  }
+
+  function flowStep(delta) {
+    setFlowStep(flowCurrent + delta);
+  }
+
+  function restartFlowAuto() {
+    if (flowAutoTimer) clearInterval(flowAutoTimer);
+    flowAutoTimer = setInterval(() => {
+      flowCurrent = (flowCurrent + 1) % FLOW_TOTAL;
+      renderFlow();
+    }, 4500);
+  }
+
+  renderFlow();
+  restartFlowAuto();
+</script>
+
+</body>
+</html>

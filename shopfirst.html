@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="crownd-logo.png"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crownd — Welcome to the brand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --mint:    #EAF7F4;
+    --maroon:  #A8284C;
+    --sage:    #7A8C6A;
+    --warm:    #FDF6F0;
+    --dark:    #1C2221;
+    --muted:   #5A6460;
+    --pink:    #F0997B;
+    --teal:    #5DCAA5;
+    --amber:   #FAC775;
+    --lavender:#AFA9EC;
+    --cream:   #F9F4EE;
+    --error:   #C24545;
+    --success: #1C7A5C;
+    --coronet: #5DCAA5;
+    --regalia: #AFA9EC;
+    --sovereign: #FAC775;
+    --nav-h: 61px;
+    --ribbon-h: 52px;
+    --sub-ribbon-h: 56px;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--mint);
+    color: var(--dark);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  .blob-field { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .blob { position: absolute; border-radius: 50%; opacity: 0.4; filter: blur(95px); animation: blobdrift 18s ease-in-out infinite alternate; }
+  .blob-1 { width: 460px; height: 460px; top: -140px; right: -100px; background: radial-gradient(circle, var(--pink), var(--amber)); animation-delay: 0s; }
+  .blob-2 { width: 360px; height: 360px; bottom: 5%; left: -120px; background: radial-gradient(circle, var(--teal), var(--lavender)); animation-delay: -6s; }
+  @keyframes blobdrift { 0% { transform: translate(0,0) scale(1);} 100% { transform: translate(28px,18px) scale(1.06);} }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px;
+    height: var(--nav-h);
+    background: rgba(234, 247, 244, 0.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(122,140,106,0.14);
+  }
+  .logo { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 24px; letter-spacing: -0.5px; text-decoration: none; }
+  .logo span:first-child { color: var(--maroon); }
+  .logo span:last-child  { color: var(--sage); }
+  .nav-back {
+    font-size: 13px; font-weight: 600; color: var(--muted); text-decoration: none;
+    display: flex; align-items: center; gap: 6px; transition: color 0.18s;
+    background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  }
+  .nav-back:hover { color: var(--dark); }
+
+  /* ── SCORE RIBBON (matches dashboard.html, fixed below nav) ── */
+  .score-ribbon {
+    position: fixed;
+    top: var(--nav-h);
+    left: 0; right: 0;
+    z-index: 90;
+    height: var(--ribbon-h);
+    display: flex; align-items: center;
+    padding: 0 48px;
+    gap: 0;
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(168,40,76,0.10);
+    box-shadow: 0 2px 16px rgba(28,34,33,0.05);
+  }
+  .ribbon-left { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+  .ribbon-crown { font-size: 20px; line-height: 1; filter: drop-shadow(0 1px 4px rgba(168,40,76,0.28)); }
+  .ribbon-score-label {
+    font-size: 9.5px; font-weight: 700; letter-spacing: 2.2px;
+    text-transform: uppercase; color: var(--sage);
+    line-height: 1; margin-bottom: 2px;
+  }
+  .ribbon-score-num {
+    font-family: 'DM Serif Display', serif; font-style: italic;
+    font-size: 26px; line-height: 1;
+    color: var(--maroon); letter-spacing: -1px;
+  }
+  .ribbon-divider { width: 1px; height: 28px; background: rgba(122,140,106,0.18); margin: 0 22px; flex-shrink: 0; }
+  .ribbon-sub { font-size: 12.5px; color: var(--muted); font-weight: 500; flex-shrink: 0; }
+  .ribbon-sub strong { color: var(--dark); font-weight: 700; }
+  .ribbon-spacer { flex: 1; }
+  .ribbon-stats { display: flex; gap: 8px; align-items: center; }
+  .ribbon-pill {
+    display: flex; align-items: center; gap: 7px;
+    padding: 5px 13px;
+    background: rgba(234,247,244,0.7);
+    border: 1px solid rgba(122,140,106,0.16);
+    border-radius: 100px;
+  }
+  .ribbon-pill .r-val { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 15px; color: var(--dark); line-height: 1; }
+  .ribbon-pill .r-lbl { font-size: 9.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.9px; }
+
+  /* ── SUB RIBBON — streak (left) + back to dashboard (right) ── */
+  .sub-ribbon {
+    position: fixed;
+    top: calc(var(--nav-h) + var(--ribbon-h));
+    left: 0; right: 0;
+    z-index: 85;
+    height: var(--sub-ribbon-h);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px;
+    background: rgba(253,248,243,0.88);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(122,140,106,0.12);
+  }
+  .sub-ribbon-streak { display: flex; align-items: center; gap: 12px; }
+  .sub-ribbon-flame {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--amber), var(--pink));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .sub-ribbon-streak-text { display: flex; flex-direction: column; line-height: 1.25; }
+  .sub-ribbon-streak-num { font-size: 13.5px; font-weight: 700; color: var(--dark); }
+  .sub-ribbon-streak-num span { font-weight: 600; color: var(--muted); margin-left: 3px; }
+  .sub-ribbon-streak-sub { font-size: 11px; color: var(--muted); }
+  .sub-ribbon-back {
+    font-size: 12.5px; font-weight: 700; color: var(--dark);
+    background: rgba(122,140,106,0.1);
+    border: 1px solid rgba(122,140,106,0.22);
+    padding: 9px 18px; border-radius: 100px;
+    cursor: pointer; display: flex; align-items: center; gap: 7px;
+    transition: all 0.18s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .sub-ribbon-back:hover { background: var(--dark); color: white; border-color: var(--dark); }
+
+  main { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: calc(var(--nav-h) + var(--ribbon-h) + var(--sub-ribbon-h) + 32px) 32px 100px; }
+
+  /* ── WELCOME HERO ── */
+  .welcome-hero { text-align: center; padding: 56px 0 36px; }
+
+  .welcome-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: none;
+    border: none;
+    padding: 0; border-radius: 0;
+    font-size: 18px; font-weight: 700; letter-spacing: 0.6px;
+    color: var(--maroon); text-transform: uppercase;
+    margin-bottom: 26px;
+    animation: badgeIn 0.5s cubic-bezier(.2,.8,.3,1.1), badgeBounce 1.8s ease-in-out 0.6s infinite;
+  }
+  @keyframes badgeIn { from { opacity: 0; transform: translateY(-8px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes badgeBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.35); }
+  }
+
+  .brand-avatar-ring {
+    width: 144px; height: 144px; border-radius: 50%;
+    margin: 0 auto 22px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--maroon), #7A1832);
+    box-shadow: 0 14px 36px rgba(168,40,76,0.3);
+    font-family: 'DM Serif Display', serif; font-style: italic;
+    font-size: 57px; color: white;
+    overflow: hidden;
+    animation: avatarPop 0.5s cubic-bezier(.2,.8,.3,1.2) 0.1s both;
+  }
+  .brand-avatar-ring img {
+    width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+  }
+  @keyframes avatarPop { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
+
+  .welcome-title {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: clamp(30px, 5vw, 42px);
+    color: var(--dark);
+    line-height: 1.18;
+    margin-bottom: 14px;
+  }
+  .welcome-title strong { font-style: normal; font-family: 'DM Sans', sans-serif; font-weight: 700; color: var(--maroon); }
+  .welcome-sub { font-size: 15px; color: var(--muted); max-width: 480px; margin: 0 auto; line-height: 1.65; }
+
+  /* ── FIRST-TIME OFFER — FULL BLEED, CELEBRATORY ── */
+  .offer-band {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-top: 32px;
+    margin-bottom: 36px;
+    padding: 56px 32px 60px;
+    overflow: hidden;
+    text-align: center;
+    background: linear-gradient(120deg, #7A1832 0%, var(--maroon) 35%, #C9763A 65%, var(--maroon) 100%);
+    background-size: 220% 220%;
+    animation: offerGradientShift 9s ease-in-out infinite;
+    color: white;
+  }
+  @keyframes offerGradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .offer-band::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 15% 25%, rgba(250,199,117,0.28), transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(93,202,165,0.22), transparent 50%),
+                radial-gradient(circle at 50% 10%, rgba(255,255,255,0.12), transparent 40%);
+    pointer-events: none;
+  }
+
+  /* Confetti-style scatter — lightweight CSS shapes, no JS library needed */
+  .offer-confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .confetti-piece {
+    position: absolute;
+    opacity: 0.85;
+    animation: confettiDrift ease-in-out infinite;
+  }
+  @keyframes confettiDrift {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-22px) rotate(180deg); }
+  }
+
+  .offer-inner { position: relative; z-index: 3; max-width: 520px; margin: 0 auto; }
+
+  .offer-eyebrow {
+    font-size: 12.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--amber); margin-bottom: 18px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+
+  .offer-pct-wrap { position: relative; display: inline-block; margin-bottom: 14px; }
+  .offer-pct-glow {
+    position: absolute; inset: -30px;
+    background: radial-gradient(circle, rgba(250,199,117,0.45), transparent 70%);
+    filter: blur(20px);
+    animation: pctGlowPulse 2.2s ease-in-out infinite;
+    z-index: 0;
+  }
+  @keyframes pctGlowPulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+  .offer-pct {
+    position: relative; z-index: 1;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 76px; font-weight: 800; letter-spacing: -3px;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    animation: pctPop 0.6s cubic-bezier(.2,.8,.3,1.3) 0.2s both;
+  }
+  @keyframes pctPop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+  .offer-pct span { font-size: 30px; font-weight: 700; opacity: 0.85; margin-left: 4px; }
+
+  .offer-detail {
+    font-size: 14.5px; color: rgba(255,255,255,0.78); line-height: 1.65;
+    max-width: 420px; margin: 0 auto 28px;
+  }
+
+  .offer-cta {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-size: 15px; font-weight: 700;
+    padding: 16px 38px; border-radius: 100px;
+    background: var(--amber); color: var(--dark);
+    border: none; cursor: pointer;
+    box-shadow: 0 10px 28px rgba(250,199,117,0.35);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .offer-cta:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 14px 34px rgba(250,199,117,0.45); }
+
+  @media (max-width: 620px) {
+    .offer-band { padding: 44px 22px 48px; }
+    .offer-pct { font-size: 56px; }
+  }
+
+  /* ── STREAK ── */
+  .streak-card {
+    display: flex; align-items: center; gap: 18px;
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(122,140,106,0.18);
+    border-radius: 20px;
+    padding: 22px 26px;
+    margin-bottom: 36px;
+  }
+  .streak-flame {
+    width: 54px; height: 54px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--amber), var(--pink));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 8px 18px rgba(250,199,117,0.3);
+  }
+  .streak-info { flex: 1; }
+  .streak-count { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: var(--dark); }
+  .streak-count span { font-size: 13px; font-weight: 600; color: var(--muted); margin-left: 4px; }
+  .streak-meta { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .streak-dots { display: flex; gap: 5px; flex-shrink: 0; }
+  .streak-dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(122,140,106,0.18); }
+  .streak-dot.filled { background: var(--maroon); }
+
+  /* ── SECTION HEADERS ── */
+  .section-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--sage); margin-bottom: 8px; }
+  .section-title { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 24px; color: var(--dark); margin-bottom: 6px; }
+  .section-desc { font-size: 13.5px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+
+  /* ── CASHBACK TIER TABLE ── */
+  .tier-table {
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(122,140,106,0.16);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 40px;
+  }
+  .tier-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid rgba(122,140,106,0.1);
+  }
+  .tier-row:last-child { border-bottom: none; }
+  .tier-row.highlight { background: rgba(168,40,76,0.05); }
+  .tier-row-left { display: flex; align-items: center; gap: 12px; }
+  .tier-icon { font-size: 18px; }
+  .tier-row-label { font-size: 14px; font-weight: 600; color: var(--dark); }
+  .tier-row-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .tier-row-pct { font-family: 'DM Sans', sans-serif; font-size: 19px; font-weight: 700; color: var(--maroon); }
+  .tier-row-cap { font-size: 11.5px; color: var(--muted); text-align: right; margin-top: 2px; }
+  .first-time-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10.5px; font-weight: 700;
+    background: rgba(250,199,117,0.25); color: #8A6310;
+    padding: 2px 9px; border-radius: 100px;
+    margin-left: 8px;
+  }
+
+  /* ── RULES ── */
+  .rules-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+  .rule-card {
+    display: flex; gap: 16px;
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(122,140,106,0.16);
+    border-radius: 18px;
+    padding: 18px 22px;
+  }
+  .rule-icon {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; background: rgba(122,140,106,0.1);
+  }
+  .rule-text h4 { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+  .rule-text p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .rule-text code {
+    background: rgba(122,140,106,0.12); padding: 1px 7px; border-radius: 6px;
+    font-family: 'DM Sans', sans-serif; font-weight: 600; color: var(--dark); font-size: 12px;
+  }
+
+  /* ── CONTENT TYPE RULES ── */
+  .content-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 44px; }
+  .content-type-card {
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(122,140,106,0.16);
+    border-radius: 18px;
+    padding: 20px 22px;
+  }
+  .content-type-card.story { border-color: rgba(175,169,236,0.4); }
+  .content-type-card.post { border-color: rgba(168,40,76,0.25); }
+  .content-type-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; display: flex; align-items: center; gap: 7px; }
+  .content-type-card.story .content-type-label { color: #6860c5; }
+  .content-type-card.post .content-type-label { color: var(--maroon); }
+  .content-type-pct { font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+  .content-type-card ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .content-type-card li { font-size: 12.5px; color: var(--muted); display: flex; gap: 7px; }
+  .content-type-card li::before { content: '–'; flex-shrink: 0; color: var(--sage); }
+
+  /* ── BOTTOM CTA ── */
+  .bottom-cta {
+    text-align: center;
+    padding: 40px 28px;
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(122,140,106,0.16);
+    border-radius: 22px;
+    margin-bottom: 40px;
+  }
+  .bottom-cta h3 { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 22px; color: var(--dark); margin-bottom: 10px; }
+  .bottom-cta p { font-size: 13.5px; color: var(--muted); margin-bottom: 22px; }
+  .bottom-cta-btn {
+    font-size: 14.5px; font-weight: 700;
+    padding: 14px 36px; border-radius: 100px;
+    background: var(--dark); color: white; border: none; cursor: pointer;
+    transition: transform 0.16s ease;
+  }
+  .bottom-cta-btn:hover { transform: translateY(-2px); }
+
+  .page-banner { display: none; margin: 18px 0 0; }
+  .page-banner.show { display: block; }
+  .page-banner-inner { font-size: 13.5px; padding: 13px 18px; border-radius: 14px; line-height: 1.5; background: rgba(194,69,69,0.1); color: var(--error); border: 1px solid rgba(194,69,69,0.25); }
+
+  @media (max-width: 620px) {
+    nav { padding: 0 20px; }
+    .score-ribbon, .sub-ribbon { padding: 0 20px; }
+    .ribbon-sub { display: none; }
+    .ribbon-divider { margin: 0 14px; }
+    main { padding: calc(var(--nav-h) + var(--ribbon-h) + var(--sub-ribbon-h) + 24px) 18px 80px; }
+    .content-type-grid { grid-template-columns: 1fr; }
+    .tier-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .tier-row-pct { align-self: flex-end; margin-top: -28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob-field" aria-hidden="true">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+</div>
+
+<nav>
+  <a class="logo" href="dashboard.html"><span>crow</span><span>nd</span></a>
+  <div class="nav-right" style="display:flex;align-items:center;gap:14px;">
+    <span class="nav-handle" style="font-size:13px;font-weight:600;color:var(--muted);">@<span id="navHandle">janvi.creates</span></span>
+    <div class="nav-avatar" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--maroon),var(--pink));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;">JS</div>
+  </div>
+</nav>
+
+<!-- ── SCORE RIBBON (same as dashboard.html) ── -->
+<div class="score-ribbon" id="scoreRibbon">
+  <div class="ribbon-left">
+    <div class="ribbon-crown">👑</div>
+    <div>
+      <div class="ribbon-score-label">Crownd Score</div>
+      <div class="ribbon-score-num" id="scoreNumber">342</div>
+    </div>
+  </div>
+  <div class="ribbon-divider"></div>
+  <div class="ribbon-sub" id="scoreSub"><strong>Janvi</strong>'s influence, measured.</div>
+  <div class="ribbon-spacer"></div>
+  <div class="ribbon-stats" id="scoreStats">
+    <div class="ribbon-pill"><div class="r-val">18</div><div class="r-lbl">Posts</div></div>
+    <div class="ribbon-pill"><div class="r-val">14</div><div class="r-lbl">Verified</div></div>
+    <div class="ribbon-pill"><div class="r-val">4.7%</div><div class="r-lbl">Avg. Eng.</div></div>
+    <div class="ribbon-pill"><div class="r-val">6</div><div class="r-lbl">Brands</div></div>
+  </div>
+</div>
+
+<!-- ── SUB RIBBON — this brand's streak (left) + back to dashboard (right) ── -->
+<div class="sub-ribbon" id="subRibbon">
+  <div class="sub-ribbon-streak">
+    <div class="sub-ribbon-flame">🔥</div>
+    <div class="sub-ribbon-streak-text">
+      <div class="sub-ribbon-streak-num" id="subRibbonStreakNum">0 <span>week streak</span></div>
+      <div class="sub-ribbon-streak-sub" id="subRibbonStreakBrand">with this brand</div>
+    </div>
+  </div>
+  <button class="sub-ribbon-back" onclick="window.location.href='dashboard.html'">← Back to dashboard</button>
+</div>
+
+<div class="page-banner" id="pageBanner" style="max-width:760px;margin:18px auto 0;padding:0 32px;">
+  <div class="page-banner-inner" id="pageBannerInner"></div>
+</div>
+
+<main>
+
+  <!-- WELCOME HERO -->
+  <div class="welcome-hero">
+    <div class="welcome-badge">✦ Your first visit here</div>
+    <div class="brand-avatar-ring" id="brandAvatar">?</div>
+    <h1 class="welcome-title">Welcome to <strong id="brandNameTitle">the brand</strong></h1>
+    <p class="welcome-sub" id="welcomeSub">Loading what this partnership looks like for you…</p>
+  </div>
+
+  <!-- FIRST-TIME OFFER -->
+  <div class="offer-band">
+    <div class="offer-confetti" id="offerConfetti"></div>
+    <div class="offer-inner">
+      <div class="offer-eyebrow">🎉 First-purchase bonus · this brand only</div>
+      <div class="offer-pct-wrap">
+        <div class="offer-pct-glow"></div>
+        <div class="offer-pct" id="offerPct">—<span>% cashback</span></div>
+      </div>
+      <p class="offer-detail" id="offerDetail">Your very first purchase here earns a boosted rate, on top of the standard tiers below — a one-time welcome bonus for trying something new.</p>
+      <button class="offer-cta" id="shopNowBtn" onclick="goShopNow()">Shop now and claim it →</button>
+    </div>
+  </div>
+
+  <!-- STREAK -->
+  <div class="streak-card">
+    <div class="streak-flame">🔥</div>
+    <div class="streak-info">
+      <div class="streak-count" id="streakCount">0 <span>week streak with this brand</span></div>
+      <div class="streak-meta" id="streakMeta">Shop and post once a month to keep it alive.</div>
+    </div>
+    <div class="streak-dots" id="streakDots"></div>
+  </div>
+
+  <!-- CASHBACK TIERS -->
+  <div class="section-eyebrow">Cashback tiers</div>
+  <h2 class="section-title">What you earn, by purchase size</h2>
+  <p class="section-desc">Cashback is a percentage of what you spend, capped per purchase. Larger baskets unlock a better effective rate up to the cap — here's exactly how it breaks down for this brand.</p>
+
+  <div class="tier-table" id="tierTable"></div>
+
+  <!-- POST vs STORY -->
+  <div class="section-eyebrow">Content type rules</div>
+  <h2 class="section-title">Post or story — both count, differently</h2>
+  <p class="section-desc">Pick the format that fits what you're sharing. Feed posts earn more because they stay visible longer and reach more of your audience.</p>
+
+  <div class="content-type-grid">
+    <div class="content-type-card post">
+      <div class="content-type-label">◆ Feed post</div>
+      <div class="content-type-pct" id="postPct">—%</div>
+      <ul>
+        <li>Tag the brand directly in the photo or carousel</li>
+        <li>Must stay live and public for the full 14-day check</li>
+        <li>Counts toward your weekly streak with this brand</li>
+      </ul>
+    </div>
+    <div class="content-type-card story">
+      <div class="content-type-label">● Story</div>
+      <div class="content-type-pct" id="storyPct">—%</div>
+      <ul>
+        <li>Tag the brand's handle as a sticker, visible on tap</li>
+        <li>Story replays don't count — needs to be freshly posted</li>
+        <li>Lower cap than a feed post, faster to verify</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ALL RULES -->
+  <div class="section-eyebrow">House rules</div>
+  <h2 class="section-title">Everything that affects your payout</h2>
+  <p class="section-desc">Set by this brand, shown here so there's never a surprise when cashback lands.</p>
+
+  <div class="rules-grid" id="rulesGrid"></div>
+
+  <!-- BOTTOM CTA -->
+  <div class="bottom-cta">
+    <h3>Ready for your first one?</h3>
+    <p id="bottomCtaSub">Shop, post, and your first-time bonus locks in automatically.</p>
+    <button class="bottom-cta-btn" onclick="goShopNow()">Start shopping →</button>
+  </div>
+
+</main>
+
+<script>
+  const API_BASE = 'http://127.0.0.1:8000';
+
+  // Brand logos are served from public Supabase Storage URLs (brand-logos bucket).
+  // Brands without a logo_url fall back to a maroon initial-letter circle.
+
+  function getQueryParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
+  }
+
+  function showPageBanner(msg) {
+    document.getElementById('pageBannerInner').textContent = msg;
+    document.getElementById('pageBanner').classList.add('show');
+  }
+
+  function tierLabel(tier) {
+    if (tier === 'coronet')   return 'Crown';
+    if (tier === 'regalia')   return 'Throne';
+    if (tier === 'sovereign') return 'Empire';
+    return tier;
+  }
+
+  // Same mock brand set used on dashboard.html, kept in sync so this page
+  // works standalone for the demo without requiring a live backend call.
+  const MOCK_BRANDS = [
+    { id: 'b1', name: 'Mamaearth', description: 'Natural skincare', category: 'Beauty', campaign_tier: 'coronet', cashback_percentage: 12, max_cashback_cap: 500, max_redemptions_per_user: 3, min_crownd_score: 0, logo_url: 'https://pdgrecrhdhicalpxhcjc.supabase.co/storage/v1/object/public/brand-logos/mamaearth%20logo.png' },
+    { id: 'b2', name: 'Bewakoof', description: 'Trendy streetwear', category: 'Fashion', campaign_tier: 'coronet', cashback_percentage: 15, max_cashback_cap: 750, max_redemptions_per_user: 2, min_crownd_score: 100, logo_url: 'https://pdgrecrhdhicalpxhcjc.supabase.co/storage/v1/object/public/brand-logos/bewakoof%20logo.png' },
+    { id: 'b3', name: 'Noise', description: 'Smart wearables', category: 'Tech', campaign_tier: 'regalia', cashback_percentage: 18, max_cashback_cap: 1200, max_redemptions_per_user: 2, min_crownd_score: 250, logo_url: 'https://pdgrecrhdhicalpxhcjc.supabase.co/storage/v1/object/public/brand-logos/noise%20logo.png' },
+    { id: 'b4', name: 'boAt', description: 'Audio & wearables', category: 'Tech', campaign_tier: 'regalia', cashback_percentage: 20, max_cashback_cap: 1500, max_redemptions_per_user: 2, min_crownd_score: 300, logo_url: 'https://pdgrecrhdhicalpxhcjc.supabase.co/storage/v1/object/public/brand-logos/boat-company-logo.jpg' },
+    { id: 'b5', name: 'Nykaa', description: 'Beauty & wellness', category: 'Beauty', campaign_tier: 'sovereign', cashback_percentage: 25, max_cashback_cap: 3000, max_redemptions_per_user: 1, min_crownd_score: 500 },
+    { id: 'b6', name: 'Lenskart', description: 'Eyewear for all', category: 'Lifestyle', campaign_tier: 'sovereign', cashback_percentage: 22, max_cashback_cap: 2500, max_redemptions_per_user: 1, min_crownd_score: 600 },
+    { id: 'b7', name: 'Cult.fit', description: 'Fitness & wellness', category: 'Fitness', campaign_tier: 'regalia', cashback_percentage: 16, max_cashback_cap: 900, max_redemptions_per_user: 3, min_crownd_score: 450 },
+  ];
+
+  let activeBrand = null;
+
+  function resolveBrand() {
+    const brandParam = (getQueryParam('brand') || 'boAt').trim();
+    const match = MOCK_BRANDS.find(b => b.name.toLowerCase() === brandParam.toLowerCase())
+      || MOCK_BRANDS.find(b => b.id === brandParam);
+    return match || MOCK_BRANDS.find(b => b.name === 'boAt');
+  }
+
+  function renderBrandHeader(brand) {
+    const avatarEl = document.getElementById('brandAvatar');
+    if (brand.logo_url) {
+      avatarEl.innerHTML = `<img src="${brand.logo_url}" alt="${brand.name} logo" onerror="this.parentElement.innerHTML = '${brand.name.charAt(0)}';">`;
+    } else {
+      avatarEl.textContent = brand.name.charAt(0);
+    }
+    document.getElementById('brandNameTitle').textContent = brand.name;
+    document.getElementById('welcomeSub').textContent =
+      `${brand.description} — you've unlocked ${tierLabel(brand.campaign_tier)} tier with this brand. Here's how cashback works here, and the one-time bonus for shopping for the first time.`;
+    document.title = `Crownd — Welcome to ${brand.name}`;
+  }
+
+  function renderFirstTimeOffer(brand) {
+    // First-time bonus: a flat boost over the brand's standard top rate, capped sensibly
+    const boosted = Math.min(brand.cashback_percentage + 10, 40);
+    document.getElementById('offerPct').innerHTML = `${boosted}<span>% cashback</span>`;
+    document.getElementById('offerDetail').textContent =
+      `Your very first purchase at ${brand.name} earns ${boosted}% back — ${10}% higher than the standard rate — up to ₹${Number(brand.max_cashback_cap).toLocaleString('en-IN')}. After that, standard tiers below apply.`;
+    document.getElementById('bottomCtaSub').textContent =
+      `Shop at ${brand.name}, post or story, and your ${boosted}% first-time bonus locks in automatically.`;
+  }
+
+  function renderTierTable(brand) {
+    const table = document.getElementById('tierTable');
+    const basePct = brand.cashback_percentage;
+    const cap = brand.max_cashback_cap;
+
+    // Purchase-size tiers: cashback % step-up as spend increases, capped at the brand's max
+    const tiers = [
+      { label: 'Up to ₹999', sub: 'Entry purchases', pct: Math.max(basePct - 5, 5), capNote: `Capped at ₹${Math.round(cap * 0.2).toLocaleString('en-IN')}` },
+      { label: '₹1,000 – ₹2,999', sub: 'Standard purchases', pct: basePct, capNote: `Capped at ₹${Math.round(cap * 0.5).toLocaleString('en-IN')}` },
+      { label: '₹3,000 – ₹6,999', sub: 'Larger baskets', pct: basePct + 5, capNote: `Capped at ₹${Math.round(cap * 0.8).toLocaleString('en-IN')}` },
+      { label: '₹7,000 and above', sub: 'Maximum tier', pct: basePct + 8, capNote: `Capped at ₹${cap.toLocaleString('en-IN')}`, highlight: true },
+    ];
+
+    table.innerHTML = tiers.map(t => `
+      <div class="tier-row ${t.highlight ? 'highlight' : ''}">
+        <div class="tier-row-left">
+          <span class="tier-icon">${t.highlight ? '👑' : '◆'}</span>
+          <div>
+            <div class="tier-row-label">${t.label} ${t.highlight ? '<span class="first-time-tag">Best rate</span>' : ''}</div>
+            <div class="tier-row-sub">${t.sub}</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="tier-row-pct">${t.pct}%</div>
+          <div class="tier-row-cap">${t.capNote}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderContentTypes(brand) {
+    document.getElementById('postPct').textContent = `${brand.cashback_percentage}%`;
+    document.getElementById('storyPct').textContent = `${Math.max(brand.cashback_percentage - 6, 5)}%`;
+  }
+
+  function renderRules(brand) {
+    const grid = document.getElementById('rulesGrid');
+    const rules = [
+      {
+        icon: '🔁',
+        title: 'Redemption cap',
+        desc: `You can earn cashback on up to <code>${brand.max_redemptions_per_user}× purchases per month</code> at ${brand.name}. Extra purchases beyond that still count toward your streak, just without added cashback.`
+      },
+      {
+        icon: '💰',
+        title: 'Minimum purchase',
+        desc: `Purchases under <code>₹300</code> don't qualify for cashback — keeps the program focused on real hauls, not test transactions.`
+      },
+      {
+        icon: '📌',
+        title: 'Tagging requirement',
+        desc: `${brand.name} must be tagged directly — handle mention in a caption alone doesn't qualify. Use the official tag or sticker so verification can find it.`
+      },
+      {
+        icon: '⏱️',
+        title: '14-day verification window',
+        desc: `After you submit your post link, Crownd checks daily that it's still live and tagged correctly. Cashback is credited automatically once the 14 days are up.`
+      },
+      {
+        icon: '🚫',
+        title: 'Early deletion',
+        desc: `If your post comes down before the 14-day window finishes, that purchase won't qualify for cashback — keep it live to get paid.`
+      },
+      {
+        icon: '🔒',
+        title: 'Score requirement',
+        desc: brand.min_crownd_score > 0
+          ? `This brand needs a Crownd Score of <code>${brand.min_crownd_score}+</code> to unlock — you're in, since you're seeing this page.`
+          : `No minimum Crownd Score needed — open to every verified creator on Crownd.`
+      },
+    ];
+
+    grid.innerHTML = rules.map(r => `
+      <div class="rule-card">
+        <div class="rule-icon">${r.icon}</div>
+        <div class="rule-text">
+          <h4>${r.title}</h4>
+          <p>${r.desc}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── STREAK (per-brand, persisted in localStorage for the demo) ──
+  function streakKey(brandId) {
+    return `crownd_streak_${brandId}`;
+  }
+
+  function loadStreak(brand) {
+    const raw = localStorage.getItem(streakKey(brand.id));
+    let streak = raw ? parseInt(raw, 10) : 0;
+
+    // First-ever visit to this brand's page — seed a starting streak of 0,
+    // explicitly marking it as their first time (drives the welcome framing above)
+    const isFirstVisit = raw === null;
+    if (isFirstVisit) {
+      localStorage.setItem(streakKey(brand.id), '0');
+      streak = 0;
+    }
+
+    renderStreak(streak, isFirstVisit, brand.name);
+  }
+
+  function renderStreak(streak, isFirstVisit, brandName) {
+    document.getElementById('streakCount').innerHTML = `${streak} <span>week streak with this brand</span>`;
+    document.getElementById('streakMeta').textContent = isFirstVisit
+      ? "This is week one — shop and post to start your streak."
+      : streak > 0
+        ? "Keep it going — one verified purchase a month keeps the streak alive."
+        : "Your streak reset. Shop again this month to restart it.";
+
+    const dotsWrap = document.getElementById('streakDots');
+    const totalDots = 6;
+    let dotsHtml = '';
+    for (let i = 0; i < totalDots; i++) {
+      dotsHtml += `<div class="streak-dot ${i < streak ? 'filled' : ''}"></div>`;
+    }
+    dotsWrap.innerHTML = dotsHtml;
+
+    // Mirror the streak into the fixed sub-ribbon up top
+    const ribbonNumEl = document.getElementById('subRibbonStreakNum');
+    const ribbonBrandEl = document.getElementById('subRibbonStreakBrand');
+    if (ribbonNumEl) ribbonNumEl.innerHTML = `${streak} <span>week streak</span>`;
+    if (ribbonBrandEl) ribbonBrandEl.textContent = `with ${brandName || 'this brand'}`;
+  }
+
+  function goShopNow() {
+    if (!activeBrand) return;
+    // Bump the streak by one to simulate this visit converting into a shop+post cycle,
+    // then hand off to the dashboard where the real purchase flow lives.
+    const key = streakKey(activeBrand.id);
+    const current = parseInt(localStorage.getItem(key) || '0', 10);
+    localStorage.setItem(key, String(current + 1));
+    window.location.href = `dashboard.html?brand=${encodeURIComponent(activeBrand.name)}`;
+  }
+
+  // ── CONFETTI SCATTER for the celebratory offer band ──
+  function renderConfetti() {
+    const wrap = document.getElementById('offerConfetti');
+    const colors = ['var(--amber)', 'var(--teal)', '#FFFFFF', 'var(--pink)', 'var(--lavender)'];
+    const shapes = ['circle', 'square', 'triangle'];
+    let html = '';
+
+    for (let i = 0; i < 22; i++) {
+      const left = Math.random() * 100;
+      const top = 8 + Math.random() * 80;
+      const size = 6 + Math.random() * 8;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const shape = shapes[Math.floor(Math.random() * shapes.length)];
+      const duration = 2.2 + Math.random() * 2.4;
+      const delay = Math.random() * 2.5;
+
+      let shapeStyle = `background:${color};`;
+      if (shape === 'circle') shapeStyle += 'border-radius:50%;';
+      else if (shape === 'triangle') {
+        shapeStyle = `width:0;height:0;border-left:${size/2}px solid transparent;border-right:${size/2}px solid transparent;border-bottom:${size}px solid ${color};background:none;`;
+      }
+
+      html += `<div class="confetti-piece" style="left:${left}%; top:${top}%; width:${size}px; height:${size}px; ${shapeStyle} animation-duration:${duration}s; animation-delay:${delay}s;"></div>`;
+    }
+    wrap.innerHTML = html;
+  }
+
+  function init() {
+    activeBrand = resolveBrand();
+    if (!activeBrand) {
+      showPageBanner("Couldn't find that brand. Showing a default example instead.");
+      activeBrand = MOCK_BRANDS[0];
+    }
+    renderBrandHeader(activeBrand);
+    renderFirstTimeOffer(activeBrand);
+    renderConfetti();
+    renderTierTable(activeBrand);
+    renderContentTypes(activeBrand);
+    renderRules(activeBrand);
+    loadStreak(activeBrand);
+  }
+
+  init();
+</script>
+
+</body>
+</html>

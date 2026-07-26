@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="crownd-logo.png"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crownd — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --mint:    #EAF7F4;
+    --maroon:  #A8284C;
+    --sage:    #7A8C6A;
+    --warm:    #FDF6F0;
+    --dark:    #1C2221;
+    --muted:   #5A6460;
+    --pink:    #F0997B;
+    --teal:    #5DCAA5;
+    --amber:   #FAC775;
+    --lavender:#AFA9EC;
+    --cream:   #F9F4EE;
+    --error:   #C24545;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--mint);
+    color: var(--dark);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ── BLOBS (matches index.html) ── */
+  .blob-field {
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none; overflow: hidden;
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.55;
+    filter: blur(95px);
+    animation: blobdrift 18s ease-in-out infinite alternate;
+  }
+  .blob-1 { width: 480px; height: 480px; top: -120px; right: -80px;
+    background: radial-gradient(circle, var(--pink), var(--amber)); animation-delay: 0s; }
+  .blob-2 { width: 360px; height: 360px; bottom: 10%; left: -100px;
+    background: radial-gradient(circle, var(--teal), var(--lavender)); animation-delay: -6s; }
+  .blob-3 { width: 240px; height: 240px; bottom: -60px; right: 15%;
+    background: radial-gradient(circle, var(--amber), var(--pink)); animation-delay: -12s; }
+
+  @keyframes blobdrift {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 20px) scale(1.08); }
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px;
+    background: rgba(234, 247, 244, 0.82);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(122,140,106,0.12);
+  }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 26px;
+    letter-spacing: -0.5px;
+    text-decoration: none;
+  }
+  .logo span:first-child { color: var(--maroon); }
+  .logo span:last-child  { color: var(--sage); }
+
+  .nav-back {
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 6px;
+    transition: color 0.18s;
+  }
+  .nav-back:hover { color: var(--dark); }
+
+  /* ── AUTH WRAP ── */
+  main {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 24px 60px;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: rgba(255,255,255,0.62);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(122,140,106,0.18);
+    border-radius: 28px;
+    padding: 48px 44px 40px;
+    box-shadow: 0 30px 70px rgba(28,34,33,0.08);
+  }
+
+  .auth-eyebrow {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--sage); margin-bottom: 14px;
+  }
+
+  .auth-title {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 36px;
+    color: var(--dark);
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+  .auth-title em { color: var(--maroon); }
+
+  .auth-sub {
+    font-size: 14px; color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+
+  /* ── MODE TOGGLE ── */
+  .mode-toggle {
+    display: flex; align-items: center;
+    background: rgba(255,255,255,0.6);
+    border: 1px solid rgba(122,140,106,0.25);
+    border-radius: 100px;
+    padding: 4px;
+    margin-bottom: 32px;
+  }
+  .mode-btn {
+    flex: 1;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 9px 0;
+    border-radius: 100px; border: none;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    background: transparent; color: var(--muted);
+    text-align: center;
+  }
+  .mode-btn.active { background: var(--dark); color: white; }
+
+  /* ── FORM ── */
+  form { display: none; flex-direction: column; gap: 18px; }
+  form.active { display: flex; }
+
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field label {
+    font-size: 12.5px; font-weight: 600; color: var(--dark);
+    letter-spacing: 0.2px;
+  }
+  .field-hint { font-size: 11.5px; color: var(--muted); margin-top: -2px; }
+
+  .field input {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14.5px;
+    padding: 13px 16px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(122,140,106,0.25);
+    background: rgba(255,255,255,0.7);
+    color: var(--dark);
+    outline: none;
+    transition: border-color 0.18s, background 0.18s;
+  }
+  .field input::placeholder { color: rgba(90,100,96,0.45); }
+  .field input:focus {
+    border-color: var(--maroon);
+    background: white;
+  }
+  .field input.invalid { border-color: var(--error); }
+
+  .field-error {
+    font-size: 12px; color: var(--error);
+    min-height: 14px;
+    margin-top: -2px;
+  }
+
+  .input-prefix-wrap { position: relative; }
+  .input-prefix {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    font-size: 14.5px; color: var(--muted);
+    pointer-events: none;
+  }
+  .input-prefix-wrap input { padding-left: 30px; }
+
+  .submit-btn {
+    margin-top: 6px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 15px; font-weight: 600;
+    padding: 15px 0;
+    background: var(--dark); color: white;
+    border: none; border-radius: 100px;
+    cursor: pointer;
+    transition: transform 0.18s, opacity 0.18s, background 0.18s;
+  }
+  .submit-btn:hover { transform: translateY(-2px); opacity: 0.92; }
+  .submit-btn:disabled {
+    opacity: 0.55; cursor: default; transform: none;
+  }
+
+  .submit-btn .spinner {
+    width: 15px; height: 15px;
+    border: 2px solid rgba(255,255,255,0.35);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .submit-btn.loading .spinner { display: inline-block; }
+  .submit-btn.loading .btn-label { opacity: 0.7; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .banner {
+    display: none;
+    font-size: 13px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+  .banner.show { display: block; }
+  .banner.error {
+    background: rgba(194,69,69,0.1);
+    color: var(--error);
+    border: 1px solid rgba(194,69,69,0.25);
+  }
+  .banner.success {
+    background: rgba(93,202,165,0.14);
+    color: #1C7A5C;
+    border: 1px solid rgba(93,202,165,0.3);
+  }
+  .banner.info {
+    background: rgba(168,40,76,0.07);
+    color: var(--maroon);
+    border: 1px solid rgba(168,40,76,0.18);
+  }
+
+  .auth-footer-note {
+    margin-top: 26px;
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .auth-footer-note a { color: var(--maroon); font-weight: 600; text-decoration: none; cursor: pointer; }
+
+  .server-note {
+    margin-top: 18px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    opacity: 0.6;
+  }
+  .server-note code {
+    background: rgba(122,140,106,0.12);
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-family: monospace;
+  }
+
+  @media (max-width: 520px) {
+    nav { padding: 16px 20px; }
+    .auth-card { padding: 36px 26px 32px; border-radius: 22px; }
+    .auth-title { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob-field" aria-hidden="true">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<nav>
+  <a class="logo" href="index.html">
+    <span>crow</span><span>nd</span>
+  </a>
+  <a class="nav-back" href="index.html">← Back to home</a>
+</nav>
+
+<main>
+  <div class="auth-card">
+    <p class="auth-eyebrow">Crownd Account</p>
+    <h1 class="auth-title" id="authTitle">Welcome <em>back.</em></h1>
+    <p class="auth-sub" id="authSub">Sign in to check your wallet, your Crownd Score, and what's waiting to be cashed back.</p>
+
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="btnLoginMode" onclick="setMode('login')">Sign in</button>
+      <button class="mode-btn" id="btnSignupMode" onclick="setMode('signup')">Apply as creator</button>
+    </div>
+
+    <div class="banner" id="banner"></div>
+
+    <!-- LOGIN FORM -->
+    <form id="loginForm" class="active" onsubmit="handleLogin(event)">
+      <div class="field">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" required autocomplete="email">
+        <div class="field-error" id="loginEmailError"></div>
+      </div>
+      <div class="field">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+        <div class="field-error" id="loginPasswordError"></div>
+      </div>
+      <button type="submit" class="submit-btn" id="loginSubmitBtn">
+        <span class="spinner"></span>
+        <span class="btn-label">Sign in →</span>
+      </button>
+    </form>
+
+    <!-- SIGNUP FORM -->
+    <form id="signupForm" onsubmit="handleSignup(event)">
+      <div class="field">
+        <label for="signupName">Full name</label>
+        <input type="text" id="signupName" placeholder="Janvi Sharma" required autocomplete="name">
+        <div class="field-error" id="signupNameError"></div>
+      </div>
+      <div class="field">
+        <label for="signupEmail">Email</label>
+        <input type="email" id="signupEmail" placeholder="you@example.com" required autocomplete="email">
+        <div class="field-error" id="signupEmailError"></div>
+      </div>
+      <div class="field">
+        <label for="signupHandle">Instagram handle</label>
+        <div class="input-prefix-wrap">
+          <span class="input-prefix">@</span>
+          <input type="text" id="signupHandle" placeholder="yourhandle" required autocomplete="off">
+        </div>
+        <div class="field-hint">We'll check your follower count and engagement before approving you.</div>
+        <div class="field-error" id="signupHandleError"></div>
+      </div>
+      <div class="field">
+        <label for="signupPassword">Password</label>
+        <input type="password" id="signupPassword" placeholder="At least 8 characters" required autocomplete="new-password">
+        <div class="field-error" id="signupPasswordError"></div>
+      </div>
+      <button type="submit" class="submit-btn" id="signupSubmitBtn">
+        <span class="spinner"></span>
+        <span class="btn-label">Apply now →</span>
+      </button>
+    </form>
+
+    <p class="auth-footer-note" id="footerNote">
+      New to Crownd? <a onclick="setMode('signup')">Apply as a creator</a>
+    </p>
+
+    <p class="server-note">Connecting to <code id="apiBaseDisplay"></code></p>
+  </div>
+</main>
+
+<script>
+  // ── CONFIG ──
+  const API_BASE = 'http://127.0.0.1:8000';
+  document.getElementById('apiBaseDisplay').textContent = API_BASE;
+
+  // ── MODE SWITCHING ──
+  function setMode(mode) {
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const btnLogin = document.getElementById('btnLoginMode');
+    const btnSignup = document.getElementById('btnSignupMode');
+    const title = document.getElementById('authTitle');
+    const sub = document.getElementById('authSub');
+    const footerNote = document.getElementById('footerNote');
+
+    hideBanner();
+
+    if (mode === 'login') {
+      loginForm.classList.add('active');
+      signupForm.classList.remove('active');
+      btnLogin.classList.add('active');
+      btnSignup.classList.remove('active');
+      title.innerHTML = 'Welcome <em>back.</em>';
+      sub.textContent = "Sign in to check your wallet, your Crownd Score, and what's waiting to be cashed back.";
+      footerNote.innerHTML = 'New to Crownd? <a onclick="setMode(\'signup\')">Apply as a creator</a>';
+    } else {
+      signupForm.classList.add('active');
+      loginForm.classList.remove('active');
+      btnSignup.classList.add('active');
+      btnLogin.classList.remove('active');
+      title.innerHTML = 'Apply to <em>Crownd.</em>';
+      sub.textContent = "1,000+ followers gets you in the door. We verify reach and engagement before approving your account.";
+      footerNote.innerHTML = 'Already approved? <a onclick="setMode(\'login\')">Sign in</a>';
+    }
+  }
+
+  // ── BANNER HELPERS ──
+  function showBanner(message, type) {
+    const banner = document.getElementById('banner');
+    banner.textContent = message;
+    banner.className = 'banner show ' + type;
+  }
+  function hideBanner() {
+    const banner = document.getElementById('banner');
+    banner.className = 'banner';
+  }
+
+  function clearFieldErrors(prefix) {
+    document.querySelectorAll(`#${prefix}Form .field-error`).forEach(el => el.textContent = '');
+    document.querySelectorAll(`#${prefix}Form input`).forEach(el => el.classList.remove('invalid'));
+  }
+
+  function setFieldError(inputId, errorId, message) {
+    document.getElementById(inputId).classList.add('invalid');
+    document.getElementById(errorId).textContent = message;
+  }
+
+  function setButtonLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    btn.classList.toggle('loading', loading);
+    btn.disabled = loading;
+  }
+
+  // ── LOGIN ──
+  // Backend expects OAuth2PasswordRequestForm: x-www-form-urlencoded with "username" (= email) + "password"
+  async function handleLogin(event) {
+    event.preventDefault();
+    hideBanner();
+    clearFieldErrors('login');
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    if (!email) { setFieldError('loginEmail', 'loginEmailError', 'Email is required.'); return; }
+    if (!password) { setFieldError('loginPassword', 'loginPasswordError', 'Password is required.'); return; }
+
+    setButtonLoading('loginSubmitBtn', true);
+
+    try {
+      const body = new URLSearchParams();
+      body.append('username', email);
+      body.append('password', password);
+
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString()
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        const msg = data.detail
+          ? (Array.isArray(data.detail) ? data.detail.map(d => d.msg).join(', ') : data.detail)
+          : 'Sign in failed. Check your email and password.';
+        showBanner(msg, 'error');
+        return;
+      }
+
+      // Token shape: { access_token, token_type }
+      localStorage.setItem('crownd_token', data.access_token);
+      localStorage.setItem('crownd_token_type', data.token_type);
+
+      showBanner('Signed in. Redirecting to your dashboard…', 'success');
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 900);
+
+    } catch (err) {
+      showBanner(`Couldn't reach the Crownd server at ${API_BASE}. Make sure your backend is running locally.`, 'error');
+      console.error(err);
+    } finally {
+      setButtonLoading('loginSubmitBtn', false);
+    }
+  }
+
+  // ── SIGNUP ──
+  // Backend expects JSON: { email, password, full_name, instagram_handle }
+  async function handleSignup(event) {
+    event.preventDefault();
+    hideBanner();
+    clearFieldErrors('signup');
+
+    const full_name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    let handle = document.getElementById('signupHandle').value.trim();
+    const password = document.getElementById('signupPassword').value;
+
+    let hasError = false;
+    if (!full_name) { setFieldError('signupName', 'signupNameError', 'Tell us your name.'); hasError = true; }
+    if (!email) { setFieldError('signupEmail', 'signupEmailError', 'Email is required.'); hasError = true; }
+    if (!handle) { setFieldError('signupHandle', 'signupHandleError', 'Instagram handle is required.'); hasError = true; }
+    if (!password || password.length < 8) {
+      setFieldError('signupPassword', 'signupPasswordError', 'Use at least 8 characters.');
+      hasError = true;
+    }
+    if (hasError) return;
+
+    // strip a leading @ if they typed one, backend just wants the handle string
+    handle = handle.replace(/^@/, '');
+
+    setButtonLoading('signupSubmitBtn', true);
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          full_name,
+          instagram_handle: handle
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        const msg = data.detail
+          ? (Array.isArray(data.detail) ? data.detail.map(d => d.msg).join(', ') : data.detail)
+          : 'Could not create your account.';
+        showBanner(msg, 'error');
+        return;
+      }
+
+      // UserOut returned, not a token — signup does not log you in automatically
+      showBanner(`Application received, ${data.full_name.split(' ')[0]}. Sign in below once you're approved.`, 'success');
+      setTimeout(() => {
+        setMode('login');
+        document.getElementById('loginEmail').value = email;
+      }, 1400);
+
+    } catch (err) {
+      showBanner(`Couldn't reach the Crownd server at ${API_BASE}. Make sure your backend is running locally.`, 'error');
+      console.error(err);
+    } finally {
+      setButtonLoading('signupSubmitBtn', false);
+    }
+  }
+
+  // If there's already a valid-looking token, hint at it
+  if (localStorage.getItem('crownd_token')) {
+    showBanner("You're already signed in on this browser. Sign in again to refresh your session, or head to your dashboard.", 'info');
+  }
+</script>
+
+</body>
+</html>
